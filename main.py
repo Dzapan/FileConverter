@@ -1,23 +1,25 @@
-import argparse
+from pathlib import Path
+
+from arguments import parse_arguments
+from converters.json_handler import load_json, save_json
 
 
-def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Konwerter plików JSON, YAML i XML."
-    )
+def main() -> None:
+    arguments = parse_arguments()
 
-    parser.add_argument(
-        "-i",
-        "--input",
-        required=True,
-        help="Ścieżka do pliku wejściowego."
-    )
+    try:
+        data = load_json(Path(arguments.input))
 
-    parser.add_argument(
-        "-o",
-        "--output",
-        required=True,
-        help="Ścieżka do pliku wynikowego."
-    )
+        save_json(
+            data,
+            Path(arguments.output)
+        )
 
-    return parser.parse_args()
+        print(f"Zapisano plik: {arguments.output}")
+
+    except ValueError as error:
+        print(f"Błąd: {error}")
+
+
+if __name__ == "__main__":
+    main()
