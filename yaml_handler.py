@@ -1,25 +1,46 @@
 from pathlib import Path
+from typing import Any
 
-from arguemnts import parse_arguments
-from converters.json_handler import load_json, save_json
+import yaml
 
 
-def main() -> None:
-    arguments = parse_arguments()
-
+def load_yaml(file_path: Path) -> Any:
     try:
-        data = load_json(Path(arguments.input))
+        with file_path.open("r", encoding="utf-8") as file:
+            return yaml.safe_load(file)
 
-        save_json(
-            data,
-            Path(arguments.output)
-        )
+    except FileNotFoundError as error:
+        raise ValueError(
+            f"Nie znaleziono pliku: {file_path}"
+        ) from error
 
-        print(f"Zapisano plik: {arguments.output}")
+    except PermissionError as error:
+        raise ValueError(
+            f"Brak dostępu do pliku: {file_path}"
+        ) from error
 
-    except ValueError as error:
-        print(f"Błąd: {error}")
+    except yaml.YAMLError as error:
+        raise ValueError(
+            f"Niepoprawna składnia YAML: {error}"
+        ) from error
 
 
-if __name__ == "__main__":
-    main()
+def save_yaml(data: Any, file_path: Path) -> None:
+    try:
+        with file_path.open("w", encoding="utf-8") as file:
+            yaml.safe_dump(
+                data,
+                file,
+                allow_unicode=True,
+                sort_keys=False
+            )
+
+    except PermissionError as error:
+        raise ValueError(
+            f"Brak uprawnień do zapisu: {file_path}"
+        ) from error
+
+    except yaml.YAMLError as error:
+        raise ValueError(
+            f"Nie udało się zapisać YAML: {error}"
+        ) from error
