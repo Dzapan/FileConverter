@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from arguments import parse_arguments
+from arguemnts import parse_arguments
 from converters.json_handler import load_json, save_json
 
 
